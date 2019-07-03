@@ -1,0 +1,31 @@
+{
+	"name": "v12mike/enhancednotificationemails",
+	"type": "phpbb-extension",
+	"description": "Enhanced Notification Emails  Extension for phpBB 3.2.x",
+	"homepage": "https://github.com/v12mike/not-there-yet",
+	"version": "0.1.0",
+	"time": "2019-06-10",
+	"license": "GPL-2.0-only",
+	"authors": [
+		{
+			"name": "Mike Morrin",
+			"email": "v12mike@ingenious.co.nz",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.3.3",
+		"composer/installers": "~1.0"
+	},
+	"extra": {
+		"display-name": "Enhanced Email Notifications",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.2.0,<3.3.0@dev"
+		},
+		"version-check": {
+			"host": "frenchcarforum.co.uk",
+			"directory": "/versions",
+			"filename": "enhancednotifictionemails.json"
+		}
+	}
+}

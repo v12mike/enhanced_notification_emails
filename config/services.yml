@@ -1,0 +1,37 @@
+services:
+    v12mike.enhancednotificationemails.controller:
+        class: v12mike\enhancednotificationemails\controller\unsubscribe
+        arguments:
+            - '@controller.helper'
+            - '@service_container'
+            - '@config'
+            - '@dbal.conn'
+            - '@cache'
+            - '@template'
+            - '@request'
+            - '@user'
+            - '@user_loader'
+            - '@auth'
+            - '@v12mike.enhancednotificationemails.links'
+            - '@language'
+            - '@notification_manager'
+            - '@notification.type_collection'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%tables.notification_types%'
+            - '%tables.user_notifications%'
+
+    v12mike.enhancednotificationemails.listener:
+        class: v12mike\enhancednotificationemails\event\main_listener
+        arguments:
+            - '@notification_manager'
+            - '@v12mike.enhancednotificationemails.links'
+        tags:
+            - { name: event.listener }
+
+
+    v12mike.enhancednotificationemails.links:
+        class: v12mike\enhancednotificationemails\code\links
+
+
+

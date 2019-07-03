@@ -1,0 +1,10 @@
+v12mike_enhancednotificationemails_route:
+        path: /unsubscribe/{target_user_id}/{notification_type}/{identifier}/{time_stamp}/{token}
+        defaults: { _controller:v12mike.enhancednotificationemails.controller:handle}
+        requirements:
+            target_user_id: '\d+'
+            notification_type: '\d+'
+            identifier: '\d+'
+            time_stamp: '\d+'
+            token:      '[0123456789abcdefABCDEF]{40}'
+
