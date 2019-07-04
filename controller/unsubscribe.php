@@ -321,12 +321,12 @@ class unsubscribe
                             'EXPLAIN'			=> (isset($this->lang->lang[$type_data['lang'] . '_EXPLAIN'])) ? $this->lang->lang($type_data['lang'] . '_EXPLAIN') : '',
                         ));
                     }
-                  /*  $this->template->assign_block_vars('notification_types' . '.notification_methods', array(
+                    $this->template->assign_block_vars('notification_types' . '.notification_methods', array(
                         'METHOD'			=> 'notification.method.email',
-                        'NAME'				=> $this->lang->lang($method_data['lang']),
+                    /*    'NAME'				=> $this->lang->lang($method_data['lang']),*/
                         'AVAILABLE'			=> true,
                         'SUBSCRIBED'		=> !$this_type_selected,
-                    ));*/
+                    ));
                     $any_subscribed = true;
                     $group_subscribed = true;
                     $type_subscribed = true;
@@ -338,9 +338,9 @@ class unsubscribe
         {
         }
 
-	/*	$this->template->assign_vars(array(
-			strtoupper($block) . '_COLS' => 2,
-		));*/
+		$this->template->assign_vars(array(
+			strtoupper('notification_types') . '_COLS' => 2,
+		));
 	}
 
 	/**
