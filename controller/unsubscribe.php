@@ -38,6 +38,8 @@ class unsubscribe
 
     protected $notification_type_ids;
 
+	protected $subscription_types;
+
 	public $u_action;
 
 
@@ -88,7 +90,7 @@ class unsubscribe
 		$this->notification_types_table = $notifications_types_table;
 		$this->user_notifications_table = $user_notifications_table;
 
-        $this->notification_type_ids = array();
+        $this->notification_type_ids = $subscription_types = array();
 	}
 
 	public function handle(int $target_user_id, int $notification_type, int $identifier, int $time_stamp, string $token)
@@ -150,7 +152,7 @@ class unsubscribe
 
         /* from here on we work with the language (etc) of the target user */
         $target_user = $this->user_loader->get_user($target_user_id, true);
-        $target_lang = $target_user['lang'];
+        $target_lang = $target_user['user_lang'];
         $this->lang->set_user_language($target_lang);
 
 	//	$pagination = $this->phpbb_container->get('pagination');
@@ -263,8 +265,8 @@ class unsubscribe
         }
 
         $this->template->assign_vars(array(
-            'S_TOPIC_NOTIFY'		=> $config['allow_topic_notify'],
-            'S_FORUM_NOTIFY'		=> $config['allow_forum_notify'],
+            'S_TOPIC_NOTIFY'		=> $this->config['allow_topic_notify'],
+            'S_FORUM_NOTIFY'		=> $this->config['allow_forum_notify'],
         ));
 
 		return $this->helper->render('unsubscribe.html', 'Unsubscribe');
@@ -319,12 +321,12 @@ class unsubscribe
                             'EXPLAIN'			=> (isset($this->lang->lang[$type_data['lang'] . '_EXPLAIN'])) ? $this->lang->lang($type_data['lang'] . '_EXPLAIN') : '',
                         ));
                     }
-                    $this->template->assign_block_vars('notification_types' . '.notification_methods', array(
+                  /*  $this->template->assign_block_vars('notification_types' . '.notification_methods', array(
                         'METHOD'			=> 'notification.method.email',
                         'NAME'				=> $this->lang->lang($method_data['lang']),
                         'AVAILABLE'			=> true,
                         'SUBSCRIBED'		=> !$this_type_selected,
-                    ));
+                    ));*/
                     $any_subscribed = true;
                     $group_subscribed = true;
                     $type_subscribed = true;
@@ -336,9 +338,9 @@ class unsubscribe
         {
         }
 
-		$this->template->assign_vars(array(
+	/*	$this->template->assign_vars(array(
 			strtoupper($block) . '_COLS' => 2,
-		));
+		));*/
 	}
 
 	/**
@@ -389,7 +391,7 @@ class unsubscribe
                 'FORUM_DESC'			=> generate_text_for_display($row['forum_desc'], $row['forum_desc_uid'], $row['forum_desc_bitfield'], $row['forum_desc_options']),
                 'FORUM_SELECTED'        => $selected_type_id && ($notification_type_id_names[$selected_type_id] == 'notification.type.topic') && ($identifier == $forum_id),
 
-                'U_VIEWFORUM'			=> append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $row['forum_id'])
+                'U_VIEWFORUM'			=> append_sid("{$phpbb_root_path}viewforum.{$this->phpbb_php_ext}", 'f=' . $row['forum_id'])
             );
 
             $this->template->assign_block_vars('forumrow', $template_vars);
@@ -448,8 +450,7 @@ class unsubscribe
             ),
 
             'WHERE'		=> 'tw.user_id = ' . $user['user_id'] . '
-                AND t.topic_id = tw.topic_id
-                AND ' . $this->db->sql_in_set('t.forum_id', $forbidden_forum_ary, true, true),
+                AND t.topic_id = tw.topic_id',
 
             'ORDER_BY'	=> 't.topic_last_post_time DESC, t.topic_last_post_id DESC'
         );
@@ -458,7 +459,7 @@ class unsubscribe
 		$sql_array['LEFT_JOIN'][] = array('FROM' => array(FORUMS_TABLE => 'f'), 'ON' => 't.forum_id = f.forum_id');
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
-		$result = $this->db->sql_query_limit($sql, $config['topics_per_page'], $start);
+		$result = $this->db->sql_query_limit($sql, $this->config['topics_per_page'], $start);
 
 		$topic_list = $topic_forum_list = $global_announce_list = $rowset = array();
 		while ($row = $this->db->sql_fetchrow($result))
@@ -494,7 +495,7 @@ class unsubscribe
 		/*	topic_status($row, $replies, $unread_topic, $folder_img, $folder_alt, $topic_type);*/
 
 			$view_topic_url_params = "f=$forum_id&amp;t=$topic_id";
-			$view_topic_url = append_sid("{$phpbb_root_path}viewtopic.$phpEx", $view_topic_url_params);
+			$view_topic_url = append_sid("{$this->phpbb_root_path}viewtopic.{$this->phpbb_php_ext}", $view_topic_url_params);
 
 			// Send vars to template
 			$template_vars = array(
@@ -532,12 +533,12 @@ class unsubscribe
 
                 'TOPIC_SELECTED'        => $selected_type_id && ($notification_type_id_names[$selected_type_id] == 'notification.type.post') && ($identifier == $topic_id),
 				'U_VIEW_TOPIC'			=> $view_topic_url,
-				'U_VIEW_FORUM'			=> append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $forum_id),
+				'U_VIEW_FORUM'			=> append_sid("{$this->phpbb_root_path}viewforum.{$this->phpbb_php_ext}", 'f=' . $forum_id),
 			);
 
 			$this->template->assign_block_vars('topicrow', $template_vars);
 
-			$pagination->generate_template_pagination(append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'f=' . $row['forum_id'] . "&amp;t=$topic_id"), 'topicrow.pagination', 'start', count($topic_list), $this->config['posts_per_page'], 1, true, true);
+			$pagination->generate_template_pagination(append_sid("{$this->phpbb_root_path}viewtopic.{$this->phpbb_php_ext}", 'f=' . $row['forum_id'] . "&amp;t=$topic_id"), 'topicrow.pagination', 'start', count($topic_list), $this->config['posts_per_page'], 1, true, true);
 		}
 	}
 
