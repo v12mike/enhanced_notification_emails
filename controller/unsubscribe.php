@@ -235,7 +235,7 @@ class unsubscribe
         /* build the notification methods table */
         $this->template->assign_block_vars('notification_methods', array('METHOD'	=> 'notification.method.email', 'NAME' => 'email'));
 
-        $this->output_notification_types($subscriptions, ($identifier == 0) ? $notification_type : 0);
+        $this->output_notification_types($subscriptions, $notification_type);
 
         $this->tpl_name = 'ucp_notifications';
         $this->page_title = 'ENE_NOTIFICATION_OPTIONS';
@@ -279,12 +279,16 @@ class unsubscribe
 	* @param \phpbb\user $user
 	* @param string $block
 	*/
-	public function output_notification_types($subscriptions, $selected_type_id = 0)
+	protected function output_notification_types($subscriptions, $selected_type_id)
 	{
         $any_subscribed = false;
         $notification_types = $this->get_subscription_types();
         $notification_type_id_names = $this->get_notification_type_id_names();
-     //   $notification_type_ids = $this->notification_manager->get_notification_type_ids($notification_types);
+
+        if (($notification_type_id_names[$selected_type_id] == 'notification.type.topic') || ($notification_type_id_names[$selected_type_id] == 'notification.type.post'))
+        {
+            $selected_type_id = 0;
+        }
 
 		foreach ($notification_types as $group => $subscription_types)
 		{

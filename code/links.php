@@ -61,6 +61,7 @@ class links
     {
         $salt = 1234567;
         $token = sha1($target_user_id . $notification_type . $identifier . $time_stamp . $salt);
+        $token = substr($token, -10);
         return $token;
     }
 

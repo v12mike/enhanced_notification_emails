@@ -24,7 +24,7 @@ class main_listener implements EventSubscriberInterface
 	{
 		return array(
 			'core.modify_email_headers'	=> 'update_email_headers',
-            'core.notification_post_modify_template_vars' => 'update_template_variables'
+            'core.notification_modify_template_vars' => 'update_template_variables'
 		);
 	}
 
@@ -54,6 +54,8 @@ class main_listener implements EventSubscriberInterface
 	{
         $headers = $event['headers'];
         $headers_updated = false;
+
+        /* update the existing unsubsribe header */
         foreach ($headers as & $header)
         {
             $matches = array();
@@ -64,18 +66,20 @@ class main_listener implements EventSubscriberInterface
             if (isset($matches[1]) && isset($this->unsubscribe_links->unsubscribe_string))
             {
                $header = "List-Unsubscribe:
-<mailto:unsubscribe@frenchcarforum.co.uk?subject={$this->unsubscribe_links->unsubscribe_string}>,
-<{$matches[1]}/unsubscribe/{$this->unsubscribe_links->unsubscribe_string}>";
+    <mailto:unsubscribe@frenchcarforum.co.uk?subject={$this->unsubscribe_links->unsubscribe_string}>,
+    <{$matches[1]}/unsubscribe/{$this->unsubscribe_links->unsubscribe_string}>";
                 $headers[] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
                 $headers_updated = true;
                 break;
             }
         }
+
+        /* perhaps there was no existing unsubscribe header? */
         if (!$headers_updated && isset($this->unsubscribe_links->unsubscribe_string))
         {
             $headers[] = "List-Unsubscribe:
-<mailto:unsubscribe@frenchcarforum.co.uk?subject={$this->unsubscribe_links->unsubscribe_string}>,
-<" . generate_board_url() . "/unsubscribe/{$this->unsubscribe_links->unsubscribe_string}>";
+    <mailto:unsubscribe@frenchcarforum.co.uk?subject={$this->unsubscribe_links->unsubscribe_string}>,
+    <" . generate_board_url() . "/unsubscribe/{$this->unsubscribe_links->unsubscribe_string}>";
             $headers[] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
         }
         $event['headers'] = $headers;
@@ -86,12 +90,9 @@ class main_listener implements EventSubscriberInterface
     {
         $template_vars = $event['template_vars'];
 
-        $unsubscribe_string = $this->unsubscribe_links->create_unsubscribe_string($event['notified_user_id'], $event['notification_type_id'], $event['topic_id']);
+        $unsubscribe_string = $this->unsubscribe_links->create_unsubscribe_string($event['notified_user_id'], $event['notification_type_id'], $event['item_id']);
 
-        if (isset($template_vars['U_NOTIFICATION_SETTINGS']))
-        {
-            $template_vars['U_NOTIFICATION_SETTINGS'] = generate_board_url() . "/unsubscribe/{$unsubscribe_string}";
-        }
+        $template_vars['U_NOTIFICATION_SETTINGS'] = generate_board_url() . "/unsubscribe/{$unsubscribe_string}";
         if (isset($template_vars['U_STOP_WATCHING_FORUM']))
         {
             $template_vars['U_STOP_WATCHING_FORUM'] = generate_board_url() . "/unsubscribe/{$unsubscribe_string}";
