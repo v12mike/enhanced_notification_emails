@@ -367,7 +367,7 @@ class unsubscribe
             $forum_id = $row['forum_id'];
 
             // Which folder should we display?
-            if ($row['forum_status'] == ITEM_LOCKED)
+       /*     if ($row['forum_status'] == ITEM_LOCKED)
             {
                 $folder_image = ($unread_forum) ? 'forum_unread_locked' : 'forum_read_locked';
                 $folder_alt = 'FORUM_LOCKED';
@@ -376,7 +376,7 @@ class unsubscribe
             {
                 $folder_image = ($unread_forum) ? 'forum_unread' : 'forum_read';
                 $folder_alt = ($unread_forum) ? 'UNREAD_POSTS' : 'NO_UNREAD_POSTS';
-            }
+            }*/
 
             $template_vars = array(
                 'FORUM_ID'				=> $forum_id,
@@ -388,7 +388,7 @@ class unsubscribe
                 'FORUM_DESC'			=> generate_text_for_display($row['forum_desc'], $row['forum_desc_uid'], $row['forum_desc_bitfield'], $row['forum_desc_options']),
                 'FORUM_SELECTED'        => $selected_type_id && ($notification_type_id_names[$selected_type_id] == 'notification.type.topic') && ($identifier == $forum_id),
 
-                'U_VIEWFORUM'			=> append_sid("{$phpbb_root_path}viewforum.{$this->phpbb_php_ext}", 'f=' . $row['forum_id'])
+                'U_VIEWFORUM'			=> append_sid("{$this->phpbb_root_path}viewforum.{$this->phpbb_php_ext}", 'f=' . $row['forum_id'])
             );
 
             $this->template->assign_block_vars('forumrow', $template_vars);
