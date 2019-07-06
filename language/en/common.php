@@ -18,8 +18,7 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
-	'ENE_NOTIFICATION_OPTIONS'			=> 'Unsubscribe from notification emails',
-	'ENE_NOTIFICATION_OPTIONS_EXPLAIN'	=> 'You may unsubscribe from categories of notifications by checking the options in the upper panel on this page. For the specific categories of "subscribed forums" and "subscribed topics" you may unsubscribe from each forum and topic by checking the boxes in the lower panel of this page',
-
-	'ACP_DEMO_TITLE'			=> 'Demo Module',
+	'ENE_NOTIFICATION_OPTIONS'			=> 'Unsubscribe from notification emails for user: ',
+	'ENE_NOTIFICATION_OPTIONS_EXPLAIN'	=> 'Below is the set of notification categories that you are subscribed to.  You may unsubscribe from categories of notifications by checking the options in the panel below and clicking the UNSUBSCRIBE button.',
+	'ENE_NO_SUBSCRIBED_NOTIFICATION_TYPES' => 'You are not subscribed to any categories for email notification',
 ));

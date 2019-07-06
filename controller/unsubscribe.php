@@ -188,7 +188,7 @@ class unsubscribe
             }
         }
 
-        /* handle subscribed forums and topics */
+        /* handle updates to subscribed forums and topics */
         if (isset($_POST['unwatch']))
         {
             if (check_form_key('enhancednotificationemails_unsubscribe'))
@@ -239,15 +239,12 @@ class unsubscribe
 
         $this->output_notification_types($subscriptions, $notification_type);
 
-        $this->tpl_name = 'ucp_notifications';
-        $this->page_title = 'ENE_NOTIFICATION_OPTIONS';
-
 		$this->template->assign_vars(array(
 		/*	'TITLE'				=> $this->lang->lang($this->page_title),
 			'TITLE_EXPLAIN'		=> $this->lang->lang($this->page_title . '_EXPLAIN'),*/
 
+			'USER_NAME'			=> $target_user['username_clean'],
 			'MODE'				=> 'notification_options',
-
 			'FORM_TIME'			=> time(),
 		));
 

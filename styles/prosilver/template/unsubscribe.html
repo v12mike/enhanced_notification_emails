@@ -2,51 +2,7 @@
 
 <form id="ucp" method="post" action="{S_UCP_ACTION}"{S_FORM_ENCTYPE}>
 
-<h2>{L_ENE_NOTIFICATION_OPTIONS}</h2>
-<div class="panel">
-	<div class="inner">
-
-		<p>{L_ENE_NOTIFICATION_OPTIONS_EXPLAIN}</p>
-			<table class="table1">
-				<thead>
-					<tr>
-						<th>{L_NOTIFICATION_TYPE}</th>
-						<!-- BEGIN notification_methods -->
-							<th class="mark">{notification_methods.NAME}</th>
-						<!-- END notification_methods -->
-					</tr>
-				</thead>
-				<tbody>
-				<!-- BEGIN notification_types -->
-					<!-- IF notification_types.GROUP_NAME -->
-						<tr class="bg3">
-							<td colspan="{NOTIFICATION_TYPES_COLS}">{notification_types.GROUP_NAME}</td>
-						</tr>
-					<!-- ELSE -->
-						<tr class="<!-- IF notification_types.S_ROW_COUNT is odd -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
-							<td>
-								{notification_types.NAME}
-								<!-- IF notification_types.EXPLAIN --><br />&nbsp; &nbsp;{notification_types.EXPLAIN}<!-- ENDIF -->
-							</td>
-							<!-- BEGIN notification_methods -->
-								<td class="mark"><input type="checkbox" name="m_{notification_types.TYPE}_{notification_types.notification_methods.METHOD}"<!-- IF not notification_types.notification_methods.SUBSCRIBED --> checked="checked"<!-- ENDIF --> \></td>
-							<!-- END notification_methods -->
-						</tr>
-					<!-- ENDIF -->
-				<!-- END notification_types -->
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<!-- IF .notification_types -->
-	<fieldset class="display-actions">
-		<input type="hidden" name="form_time" value="{FORM_TIME}" />
-		{S_HIDDEN_FIELDS}
-		<input type="submit" name="submit" value="{L_UNSUBSCRIBE}" class="button2" />
-		<div><a href="#" onclick="marklist('ucp', 'm', true); return false;">{L_MARK_ALL}</a> &bull; <a href="#" onclick="marklist('ucp', 'm', false); return false;">{L_UNMARK_ALL}</a></div>
-		{S_FORM_TOKEN}
-	</fieldset>
-	<!-- ENDIF -->
+<h2>{L_ENE_NOTIFICATION_OPTIONS} {USER_NAME}</h2>
 	<div class="panel">
 		<div class="inner">
 
@@ -118,6 +74,15 @@
 		</li>
 	<!-- END topicrow -->
 	</ul>
+<!-- ELSEIF S_FORUM_NOTIFY -->
+    <ul class="topiclist">
+        <li class="header">
+            <dl class="row-item">
+                <dt>{L_WATCHED_TOPICS}</dt>
+            </dl>
+        </li>
+    </ul>
+	<p><strong>{L_NO_WATCHED_TOPICS}</strong></p>
 <!-- ENDIF -->
 	</div>
 </div>
@@ -129,7 +94,62 @@
 		{S_FORM_TOKEN}
 	</fieldset>
 <!-- ENDIF -->
+</br>
+<div class="panel">
+	<div class="inner">
 
+		<p>{L_ENE_NOTIFICATION_OPTIONS_EXPLAIN}</p>
+<!-- IF .notification_types -->
+			<table class="table1">
+				<thead>
+					<tr>
+						<th>{L_NOTIFICATION_TYPE}</th>
+						<!-- BEGIN notification_methods -->
+							<th class="mark">{notification_methods.NAME}</th>
+						<!-- END notification_methods -->
+					</tr>
+				</thead>
+				<tbody>
+				<!-- BEGIN notification_types -->
+					<!-- IF notification_types.GROUP_NAME -->
+						<tr class="bg3">
+							<td colspan="{NOTIFICATION_TYPES_COLS}">{notification_types.GROUP_NAME}</td>
+						</tr>
+					<!-- ELSE -->
+						<tr class="<!-- IF notification_types.S_ROW_COUNT is odd -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+							<td>
+								{notification_types.NAME}
+								<!-- IF notification_types.EXPLAIN --><br />&nbsp; &nbsp;{notification_types.EXPLAIN}<!-- ENDIF -->
+							</td>
+							<!-- BEGIN notification_methods -->
+								<td class="mark"><input type="checkbox" name="m_{notification_types.TYPE}_{notification_types.notification_methods.METHOD}"<!-- IF not notification_types.notification_methods.SUBSCRIBED --> checked="checked"<!-- ENDIF --> \></td>
+							<!-- END notification_methods -->
+						</tr>
+					<!-- ENDIF -->
+				<!-- END notification_types -->
+				</tbody>
+			</table>
+<!-- ELSE -->
+    <ul class="topiclist">
+        <li class="header">
+            <dl class="row-item">
+                <dt>{L_NOTIFICATION_TYPE}</dt>
+            </dl>
+        </li>
+    </ul>
+	<p><strong>{L_ENE_NO_SUBSCRIBED_NOTIFICATION_TYPES}</strong></p>
+<!-- ENDIF -->
+		</div>
+	</div>
+	<!-- IF .notification_types -->
+	<fieldset class="display-actions">
+		<input type="hidden" name="form_time" value="{FORM_TIME}" />
+		{S_HIDDEN_FIELDS}
+		<input type="submit" name="submit" value="{L_UNSUBSCRIBE}" class="button2" />
+		<div><a href="#" onclick="marklist('ucp', 'm', true); return false;">{L_MARK_ALL}</a> &bull; <a href="#" onclick="marklist('ucp', 'm', false); return false;">{L_UNMARK_ALL}</a></div>
+		{S_FORM_TOKEN}
+	</fieldset>
+	<!-- ENDIF -->
 </form>
 
 <!-- INCLUDE ucp_footer.html -->
