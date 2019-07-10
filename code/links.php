@@ -70,11 +70,21 @@ class links
         $timestamp = intdiv(time(), (3600 * 24)) - 18000;
         return $timestamp;
     }
+    
+     public function validate_timestamp(int $timestamp)
+     {
+         $validity_period = 7; //days
+         if (($this->create_timestamp() - $timestamp) > $validity_period)
+         {
+             return false;
+         }
+         return true;
+     }
 
 
     public function validate_unsubscribe_token(int $target_user_id, int $notification_type, int $identifier, int $time_stamp, $token)
     {
-        if ($token == create_token($target_user_id, $notification_type, $identifier, $time_stamp))
+        if ($token == $this->create_token($target_user_id, $notification_type, $identifier, $time_stamp))
         {
             return true;
         }

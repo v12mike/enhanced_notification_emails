@@ -91,20 +91,38 @@ class unsubscribe
 		$this->user_notifications_table = $user_notifications_table;
 
         $this->notification_type_ids = $subscription_types = array();
+        $this->forums_subscribed = false;
+        $this->topics_subscribed = false;
 	}
 
 	public function handle(int $target_user_id, int $notification_type, int $identifier, int $time_stamp, string $token)
 	{
-
         /* if this is a one-click unsubscribe, we don't generate a full html page, but just send a response code */
         if ($this->request->is_set_post('List-Unsubscribe') && ($this->request->variable('List-Unsubscribe', '') == 'One-Click'))
         {
             if ($this->unsubscribe_links->validate_unsubscribe_token($target_user_id, $notification_type, $identifier, $time_stamp, $token))
             {
-                if ($this->unsubscribe_links->validate_timestamp)
+                if ($this->unsubscribe_links->validate_timestamp($time_stamp))
                 {
                     /* this is a valid 1-click unsubscribe */
-                    $this->unsubscribe_notifications($target_user_id, $notification_type, $identifier);
+                    $id_array = array();
+                    $id_array[] = $identifier;
+                    $notification_type_id_names = array();
+                    $notification_type_id_names = $this->get_notification_type_id_names();
+                    if ($notification_type_id_names[$notification_type] == 'notification.type.topic')
+                    {
+                        $this->unsubscribe_forums($target_user_id, $id_array);
+                    }
+                    elseif ($notification_type_id_names[$notification_type] == 'notification.type.post')
+                    {
+                        $this->unsubscribe_topics($target_user_id, $id_array);
+                    }
+                    else
+                    {
+                        $notification_type_array = array();
+                        $notification_type_array[] = $notification_type;
+                        $this->unsubscribe_notifications($target_user_id, $notification_type_array);
+                    }
                     return;
                 }
                 /* expired timestamp */
@@ -163,13 +181,16 @@ class unsubscribe
             // remove subscriptions
             if (check_form_key('enhancednotificationemails_unsubscribe'))
             {
+                $notification_types = array();
                 /* unsubscribe any requested subscriptions */
+           //     $this->unsubscribe_notifications($target_user_id, $notification_type);
                 foreach ($this->get_subscription_types() as $group => $subscription_types)
                 {
                     foreach ($subscription_types as $type => $data)
                     {
                         if ($this->request->is_set_post(str_replace('.', '_', 'm_' . $type . '_notification.method.email')) && isset($subscriptions[$type]))
                         {
+                         //   $notification_types[] = 
                             $this->notification_manager->delete_subscription($type, 0, 'notification.method.email', $target_user_id);
                             unset($subscriptions[$type]);
                         }
@@ -195,35 +216,9 @@ class unsubscribe
             {
                 $forums = array_keys($this->request->variable('f', array(0 => 0)));
                 $topics = array_keys($this->request->variable('t', array(0 => 0)));
+                $this->unsubscribe_forums($target_user_id, $forums);
+                $this->unsubscribe_topics($target_user_id, $topics);
 
-                if (count($forums) || count($topics))
-                {
-                    $l_unwatch = '';
-                    if (count($forums))
-                    {
-                        $sql = 'DELETE FROM ' . FORUMS_WATCH_TABLE . '
-                            WHERE ' . $this->db->sql_in_set('forum_id', $forums) . '
-                                AND user_id = ' . $target_user['user_id'];
-                        $this->db->sql_query($sql);
-
-                        $l_unwatch .= '_FORUMS';
-                    }
-
-                    if (count($topics))
-                    {
-                        $sql = 'DELETE FROM ' . TOPICS_WATCH_TABLE . '
-                            WHERE ' . $this->db->sql_in_set('topic_id', $topics) . '
-                                AND user_id = ' . $target_user['user_id'];
-                        $this->db->sql_query($sql);
-
-                        $l_unwatch .= '_TOPICS';
-                    }
-                    $msg = $this->lang->lang('UNWATCHED' . $l_unwatch);
-                }
-                else
-                {
-                    $msg = $this->lang->lang('NO_WATCHED_SELECTED');
-                }
               /*  $message = $msg . '<br /><br />' . sprintf($this->lang->lang['RETURN_UCP'], '<a href="' . append_sid("{$phpbb_root_path}ucp.$phpEx", "i=$id&amp;mode=subscribed") . '">', '</a>');
                 meta_refresh(3, append_sid("{$phpbb_root_path}ucp.$phpEx", "i=$id&amp;mode=subscribed"));
                 trigger_error($message);*/
@@ -250,20 +245,20 @@ class unsubscribe
 
         /* build the subscribed forums table */
 
-        if ($this->config['allow_forum_notify'])
+        if ($this->config['allow_forum_notify'] && $this->forums_subscribed)
         {
             $this->assign_forumlist($target_user, $notification_type, $identifier);
         }
 
         /* build the subscribed topics table */
-        if ($this->config['allow_topic_notify'])
+        if ($this->config['allow_topic_notify'] && $this->topics_subscribed)
         {
             $this->assign_topiclist($target_user, $notification_type, $identifier);
         }
 
         $this->template->assign_vars(array(
-            'S_TOPIC_NOTIFY'		=> $this->config['allow_topic_notify'],
-            'S_FORUM_NOTIFY'		=> $this->config['allow_forum_notify'],
+            'S_TOPIC_NOTIFY'		=> ($this->config['allow_topic_notify'] && $this->topics_subscribed),
+            'S_FORUM_NOTIFY'		=> ($this->config['allow_forum_notify'] && $this->forums_subscribed),
         ));
 
 		return $this->helper->render('unsubscribe.html', 'Unsubscribe');
@@ -304,6 +299,14 @@ class unsubscribe
                 $subscribed = isset($subscriptions[$type]);
                 if ($subscribed)
                 {
+                    if ($type == 'notification.type.topic')
+                    {
+                        $this->forums_subscribed = true;
+                    }
+                    if ($type == 'notification.type.post')
+                    {
+                        $this->topics_subscribed = true;
+                    }
                     if (!$group_subscribed)
                     {
                         $this->template->assign_block_vars('notification_types', array(
@@ -622,6 +625,40 @@ class unsubscribe
 		$this->db->sql_freeresult($result);
 
         return $notification_type_id_names;
+    }
+
+    protected function unsubscribe_notifications(int $target_user_id,  $notification_type_ids)
+    {
+        $sql = 'UPDATE ' . USER_NOTIFICATIONS_TABLE . ' un
+            INNER JOIN ' . NOTIFICATION_TYPES_TABLE . ' nt
+            ON nt.notification_type_name = un.item_type
+            SET un.notify = 0
+            WHERE un.user_id = ' . $target_user_id . "
+            AND un.method = 'notification.method.email'
+            AND " . $this->db->sql_in_set('nt.notification_type_id', $notification_type_ids);
+        $this->db->sql_query($sql);
+    }
+
+    protected function unsubscribe_topics(int $target_user_id, $topic_ids)
+    {
+        if (count($topic_ids))
+        {
+            $sql = 'DELETE FROM ' . TOPICS_WATCH_TABLE . '
+                WHERE ' . $this->db->sql_in_set('topic_id', $topic_ids) . '
+                    AND user_id = ' . $target_user_id;
+            $this->db->sql_query($sql);
+        }
+    }
+
+    protected function unsubscribe_forums(int $target_user_id, $forum_ids)
+    {
+        if (count($forum_ids))
+        {
+            $sql = 'DELETE FROM ' . FORUMS_WATCH_TABLE . '
+                WHERE ' . $this->db->sql_in_set('forum_id', $forum_ids) . '
+                    AND user_id = ' . $target_user_id;
+            $this->db->sql_query($sql);
+        }
     }
 
 }

@@ -3,98 +3,7 @@
 <form id="ucp" method="post" action="{S_UCP_ACTION}"{S_FORM_ENCTYPE}>
 
 <h2>{L_ENE_NOTIFICATION_OPTIONS} {USER_NAME}</h2>
-	<div class="panel">
-		<div class="inner">
 
-	<p>{L_WATCHED_EXPLAIN}</p>
-
-<!-- IF .forumrow -->
-	<ul class="topiclist missing-column">
-		<li class="header">
-			<dl class="row-item">
-				<dt><div class="list-inner">{L_WATCHED_FORUMS}</div></dt>
-				<dd class="lastpost"><span>{L_LAST_POST}</span></dd>
-				<dd class="mark">{L_MARK}</dd>
-			</dl>
-		</li>
-	</ul>
-	<ul class="topiclist cplist missing-column">
-
-	<!-- BEGIN forumrow -->
-		<li class="row<!-- IF forumrow.S_ROW_COUNT is odd --> bg1<!-- ELSE --> bg2<!-- ENDIF -->">
-			<dl class="row-item {forumrow.FORUM_IMG_STYLE}">
-				<dt>
-					<div class="list-inner">
-						<a href="{forumrow.U_VIEWFORUM}" class="forumtitle">{forumrow.FORUM_NAME}</a><br />
-						{forumrow.FORUM_DESC}
-					</div>
-				</dt>
-				<dd class="lastpost">_<br />&nbsp;</dd>
-				<dd class="mark"><input type="checkbox" name="f[{forumrow.FORUM_ID}]" id="f{forumrow.FORUM_ID}" <!-- IF forumrow.FORUM_SELECTED --> checked="checked"<!-- ENDIF --> /></dd>
-			</dl>
-		</li>
-	<!-- END forumrow -->
-	</ul>
-<!-- ELSEIF S_FORUM_NOTIFY -->
-    <ul class="topiclist">
-        <li class="header">
-            <dl class="row-item">
-                <dt>{L_WATCHED_FORUMS}</dt>
-            </dl>
-        </li>
-    </ul>
-	<p><strong>{L_NO_WATCHED_FORUMS}</strong></p>
-<!-- ENDIF -->
-    <br />
-
-<!-- IF .topicrow -->
-	<ul class="topiclist missing-column">
-		<li class="header">
-			<dl class="row-item">
-				<dt><div class="list-inner">{L_WATCHED_TOPICS}</div></dt>
-				<dd class="lastpost"><span>{L_LAST_POST}</span></dd>
-				<dd class="mark">{L_MARK}</dd>
-			</dl>
-		</li>
-	</ul>
-	<ul class="topiclist cplist missing-column">
-
-	<!-- BEGIN topicrow -->
-		<li class="row<!-- IF topicrow.S_TOPIC_REPORTED --> reported<!-- ELSEIF topicrow.S_ROW_COUNT is odd --> bg1<!-- ELSE --> bg2<!-- ENDIF -->">
-			<dl class="row-item {topicrow.TOPIC_IMG_STYLE}">
-				<dt title="{topicrow.TOPIC_FOLDER_IMG_ALT}">
-					<div class="list-inner">
-						<a href="{topicrow.U_VIEW_TOPIC}" class="topictitle">{topicrow.TOPIC_TITLE}</a>
-						<br />
-					</div>
-				</dt>
-				<dd class="lastpost"><span><dfn>{L_FORUM_NAME} </dfn>{L_IN} {topicrow.FORUM_NAME}</span></dd>
-				<dd class="mark"><input type="checkbox" name="t[{topicrow.TOPIC_ID}]" id="t{topicrow.TOPIC_ID}" <!-- IF topicrow.TOPIC_SELECTED --> checked="checked"<!-- ENDIF --> /></dd>
-			</dl>
-		</li>
-	<!-- END topicrow -->
-	</ul>
-<!-- ELSEIF S_FORUM_NOTIFY -->
-    <ul class="topiclist">
-        <li class="header">
-            <dl class="row-item">
-                <dt>{L_WATCHED_TOPICS}</dt>
-            </dl>
-        </li>
-    </ul>
-	<p><strong>{L_NO_WATCHED_TOPICS}</strong></p>
-<!-- ENDIF -->
-	</div>
-</div>
-
-<!-- IF .topicrow or .forumrow -->
-	<fieldset class="display-actions">
-		<input type="submit" name="unwatch" value="{L_UNWATCH_MARKED}" class="button2" />
-		<div><a href="#" onclick="marklist('ucp', 't', true); marklist('ucp', 'f', true); return false;">{L_MARK_ALL}</a> &bull; <a href="#" onclick="marklist('ucp', 't', false); marklist('ucp', 'f', false); return false;">{L_UNMARK_ALL}</a></div>
-		{S_FORM_TOKEN}
-	</fieldset>
-<!-- ENDIF -->
-</br>
 <div class="panel">
 	<div class="inner">
 
@@ -150,6 +59,104 @@
 		{S_FORM_TOKEN}
 	</fieldset>
 	<!-- ENDIF -->
+</br>
+<!-- IF S_FORUM_NOTIFY or S_TOPIC_NOTIFY -->
+	<div class="panel">
+		<div class="inner">
+
+	<p>{L_WATCHED_EXPLAIN}</p>
+
+<!-- IF S_FORUM_NOTIFY -->
+    <!-- IF .forumrow -->
+	<ul class="topiclist missing-column">
+		<li class="header">
+			<dl class="row-item">
+				<dt><div class="list-inner">{L_WATCHED_FORUMS}</div></dt>
+				<dd class="lastpost"><span>{L_LAST_POST}</span></dd>
+				<dd class="mark">{L_MARK}</dd>
+			</dl>
+		</li>
+	</ul>
+	<ul class="topiclist cplist missing-column">
+
+	<!-- BEGIN forumrow -->
+		<li class="row<!-- IF forumrow.S_ROW_COUNT is odd --> bg1<!-- ELSE --> bg2<!-- ENDIF -->">
+			<dl class="row-item {forumrow.FORUM_IMG_STYLE}">
+				<dt>
+					<div class="list-inner">
+						<a href="{forumrow.U_VIEWFORUM}" class="forumtitle">{forumrow.FORUM_NAME}</a><br />
+						{forumrow.FORUM_DESC}
+					</div>
+				</dt>
+				<dd class="lastpost">_<br />&nbsp;</dd>
+				<dd class="mark"><input type="checkbox" name="f[{forumrow.FORUM_ID}]" id="f{forumrow.FORUM_ID}" <!-- IF forumrow.FORUM_SELECTED --> checked="checked"<!-- ENDIF --> /></dd>
+			</dl>
+		</li>
+	<!-- END forumrow -->
+	</ul>
+    <!-- ELSE -->
+    <ul class="topiclist">
+        <li class="header">
+            <dl class="row-item">
+                <dt>{L_WATCHED_FORUMS}</dt>
+            </dl>
+        </li>
+    </ul>
+	<p><strong>{L_NO_WATCHED_FORUMS}</strong></p>
+    <!-- ENDIF -->
+    <br />
+    <!-- ENDIF -->
+
+<!-- IF S_TOPIC_NOTIFY -->
+    <!-- IF .topicrow -->
+	<ul class="topiclist missing-column">
+		<li class="header">
+			<dl class="row-item">
+				<dt><div class="list-inner">{L_WATCHED_TOPICS}</div></dt>
+				<dd class="lastpost"><span>{L_LAST_POST}</span></dd>
+				<dd class="mark">{L_MARK}</dd>
+			</dl>
+		</li>
+	</ul>
+	<ul class="topiclist cplist missing-column">
+
+	<!-- BEGIN topicrow -->
+		<li class="row<!-- IF topicrow.S_TOPIC_REPORTED --> reported<!-- ELSEIF topicrow.S_ROW_COUNT is odd --> bg1<!-- ELSE --> bg2<!-- ENDIF -->">
+			<dl class="row-item {topicrow.TOPIC_IMG_STYLE}">
+				<dt title="{topicrow.TOPIC_FOLDER_IMG_ALT}">
+					<div class="list-inner">
+						<a href="{topicrow.U_VIEW_TOPIC}" class="topictitle">{topicrow.TOPIC_TITLE}</a>
+						<br />
+					</div>
+				</dt>
+				<dd class="lastpost"><span><dfn>{L_FORUM_NAME} </dfn>{L_IN} {topicrow.FORUM_NAME}</span></dd>
+				<dd class="mark"><input type="checkbox" name="t[{topicrow.TOPIC_ID}]" id="t{topicrow.TOPIC_ID}" <!-- IF topicrow.TOPIC_SELECTED --> checked="checked"<!-- ENDIF --> /></dd>
+			</dl>
+		</li>
+	<!-- END topicrow -->
+	</ul>
+    <!-- ELSE -->
+    <ul class="topiclist">
+        <li class="header">
+            <dl class="row-item">
+                <dt>{L_WATCHED_TOPICS}</dt>
+            </dl>
+        </li>
+    </ul>
+	<p><strong>{L_NO_WATCHED_TOPICS}</strong></p>
+<!-- ENDIF -->
+    <!-- ENDIF -->
+	</div>
+</div>
+
+<!-- ENDIF -->
+<!-- IF .topicrow or .forumrow -->
+	<fieldset class="display-actions">
+		<input type="submit" name="unwatch" value="{L_UNWATCH_MARKED}" class="button2" />
+		<div><a href="#" onclick="marklist('ucp', 't', true); marklist('ucp', 'f', true); return false;">{L_MARK_ALL}</a> &bull; <a href="#" onclick="marklist('ucp', 't', false); marklist('ucp', 'f', false); return false;">{L_UNMARK_ALL}</a></div>
+		{S_FORM_TOKEN}
+	</fieldset>
+<!-- ENDIF -->
 </form>
 
 <!-- INCLUDE ucp_footer.html -->
