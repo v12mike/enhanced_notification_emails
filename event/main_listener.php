@@ -66,8 +66,8 @@ class main_listener implements EventSubscriberInterface
             if (isset($matches[1]) && isset($this->unsubscribe_links->unsubscribe_string))
             {
                $header = "List-Unsubscribe:
-    <mailto:unsubscribe@frenchcarforum.co.uk?subject={$this->unsubscribe_links->unsubscribe_string}>,
-    <{$matches[1]}/unsubscribe/{$this->unsubscribe_links->unsubscribe_string}>";
+	<{$matches[1]}/unsubscribe/{$this->unsubscribe_links->unsubscribe_string}>,
+	<mailto:unsubscribe@frenchcarforum.co.uk?subject={$this->unsubscribe_links->unsubscribe_string}>";
                 $headers[] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
                 $headers_updated = true;
                 break;
@@ -78,8 +78,8 @@ class main_listener implements EventSubscriberInterface
         if (!$headers_updated && isset($this->unsubscribe_links->unsubscribe_string))
         {
             $headers[] = "List-Unsubscribe:
-    <mailto:unsubscribe@frenchcarforum.co.uk?subject={$this->unsubscribe_links->unsubscribe_string}>,
-    <" . generate_board_url() . "/unsubscribe/{$this->unsubscribe_links->unsubscribe_string}>";
+    <" . generate_board_url() . "/unsubscribe/{$this->unsubscribe_links->unsubscribe_string}>,
+    <mailto:unsubscribe@frenchcarforum.co.uk?subject={$this->unsubscribe_links->unsubscribe_string}>";
             $headers[] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
         }
         $event['headers'] = $headers;
